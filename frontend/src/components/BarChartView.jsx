@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-
 import {
+  PieChart,
+  Pie,
+  Legend,
   BarChart,
   Bar,
   XAxis,
@@ -9,8 +9,12 @@ import {
   Tooltip,
   CartesianGrid
 } from "recharts";
-
-function BarChartView({ selectedColumn }) {
+import { useEffect, useState } from "react";
+import axios from "axios";
+function BarChartView({
+  selectedColumn,
+  chartType
+}) {
 
   const [data, setData] = useState([]);
 
@@ -36,6 +40,34 @@ function BarChartView({ selectedColumn }) {
 
   }, [selectedColumn]);
 
+
+
+if (chartType === "PIE") {
+
+  if (data.length > 10) {
+    return (
+      <h3>
+        Too many categories for Pie Chart.
+        Use Bar Chart instead.
+      </h3>
+    );
+  }
+
+  return (
+    <PieChart width={500} height={400}>
+      <Pie
+        data={data}
+        dataKey="count"
+        nameKey="name"
+        outerRadius={120}
+        label
+      />
+      <Tooltip />
+      <Legend />
+    </PieChart>
+  );
+}
+
   return (
 
     <BarChart
@@ -52,11 +84,11 @@ function BarChartView({ selectedColumn }) {
 
       <Tooltip />
 
-      <Bar dataKey="count" />
+      <Bar dataKey="count" fill="#4F46E5" />
 
     </BarChart>
 
   );
-}
 
+}
 export default BarChartView;
