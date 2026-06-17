@@ -136,6 +136,32 @@ public class FileController {
 
         return cityCounts;
     }
+
+    @GetMapping("/recommend-chart")
+    public String recommendChart(
+            @RequestParam String column
+    ) throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(rows);
+
+        String type = columns.get(column);
+
+        if ("TEXT".equals(type)) {
+            return "PIE_CHART";
+        }
+
+        if ("NUMBER".equals(type)) {
+            return "HISTOGRAM";
+        }
+
+        return "BAR_CHART";
+    }
     @GetMapping("/chart-data")
     public Map<String, Integer> chartData(
             @RequestParam String column
