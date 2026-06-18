@@ -9,14 +9,14 @@ import java.util.Map;
 @Service
 public class ColumnDetectorService {
 
-    public Map<String,String> detectColumns(
+    public Map<String, String> detectColumns(
             List<String[]> rows
     ) {
 
-        Map<String,String> result =
+        Map<String, String> result =
                 new HashMap<>();
 
-        if(rows.isEmpty()) {
+        if (rows.isEmpty()) {
             return result;
         }
 
@@ -24,18 +24,20 @@ public class ColumnDetectorService {
 
         String[] sampleRow = rows.get(1);
 
-        for(int i=0;i<headers.length;i++) {
+        for (int i = 0; i < headers.length; i++) {
 
             String value = sampleRow[i];
 
-            if(value.matches("\\d+")) {
+            try {
+
+                Double.parseDouble(value);
 
                 result.put(
                         headers[i],
                         "NUMBER"
                 );
 
-            } else {
+            } catch (Exception e) {
 
                 result.put(
                         headers[i],
