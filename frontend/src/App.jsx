@@ -13,6 +13,10 @@ function App() {
   const [rows, setRows] = useState([]);
   const [stats, setStats] = useState({});
   const [charts, setCharts] = useState([]);
+  const [insights, setInsights] = useState([]);
+  const [correlations, setCorrelations] = useState([]);
+  const [datasetHealth, setDatasetHealth] =
+    useState(null);
   const [file, setFile] = useState(null);
   const [columns, setColumns] = useState({});
   const [selectedColumn, setSelectedColumn] = useState("");
@@ -89,6 +93,34 @@ function App() {
       .then((response) => {
         setCharts(response.data);
       });
+  axios
+    .get(
+      "http://localhost:8080/api/dataset-health"
+    )
+    .then((response) => {
+
+      setDatasetHealth(
+        response.data
+      );
+
+    });
+
+    axios
+      .get("http://localhost:8080/api/insights")
+      .then((response) => {
+        setInsights(response.data);
+      });
+
+    axios
+      .get("http://localhost:8080/api/correlations")
+      .then((response) => {
+
+        setCorrelations(
+          response.data
+        );
+
+      });
+
   }, []);
 
   const uploadFile = () => {
@@ -384,6 +416,146 @@ function App() {
           marginBottom: "20px"
         }}
       >
+
+
+<div
+  style={{
+    marginBottom: "30px"
+  }}
+>
+
+    {datasetHealth && (
+
+      <div
+        style={{
+          border: "1px solid #333",
+          borderRadius: "12px",
+          padding: "20px",
+          marginBottom: "30px",
+          backgroundColor: "#111827"
+        }}
+      >
+
+        <h2>
+          Dataset Health
+        </h2>
+
+        <h1
+          style={{
+            margin: "10px 0"
+          }}
+        >
+          {datasetHealth.score}/100
+        </h1>
+
+        <h3>
+
+          {datasetHealth.status ===
+           "Excellent" && "🟢 Excellent"}
+
+          {datasetHealth.status ===
+           "Good" && "🟡 Good"}
+
+          {datasetHealth.status ===
+           "Fair" && "🟠 Fair"}
+
+          {datasetHealth.status ===
+           "Poor" && "🔴 Poor"}
+
+        </h3>
+
+      </div>
+
+    )}
+
+
+  <h2>
+    Strong Relationships
+  </h2>
+
+  {correlations.length === 0 ? (
+
+    <div
+      style={{
+        padding: "15px",
+        border: "1px solid #333",
+        borderRadius: "10px"
+      }}
+    >
+      No significant numeric relationships found.
+    </div>
+
+  ) : (
+
+    correlations.map((corr, index) => (
+
+      <div
+        key={index}
+        style={{
+          padding: "15px",
+          border: "1px solid #333",
+          borderRadius: "10px",
+          marginBottom: "10px"
+        }}
+      >
+        <h3>
+          🔗 {corr.column1} ↔ {corr.column2}
+        </h3>
+
+        <p>
+          Correlation Strength:
+          {" "}
+          <strong>
+            {corr.correlation.toFixed(2)}
+          </strong>
+        </p>
+
+      </div>
+
+    ))
+
+  )}
+
+</div>
+
+    <div
+      style={{
+        marginBottom: "30px"
+      }}
+    >
+      <h2>AI Insights</h2>
+
+      {insights.map((insight, index) => (
+
+        <div
+          key={index}
+          style={{
+            padding: "15px",
+            border: "1px solid #333",
+            borderRadius: "10px",
+            marginBottom: "10px",
+            backgroundColor: "#111827"
+          }}
+        >
+
+          <span
+            style={{
+              fontSize: "18px"
+            }}
+          >
+            💡
+          </span>
+
+          {" "}
+
+          {insight.message}
+
+        </div>
+
+      ))}
+
+    </div>
+
         <h2>Recommended Charts</h2>
 
         <ul

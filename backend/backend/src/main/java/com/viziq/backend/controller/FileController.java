@@ -17,11 +17,24 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import com.viziq.backend.service.InsightService;
+import com.viziq.backend.model.Insight;
+import com.viziq.backend.service.CorrelationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.viziq.backend.model.CorrelationResult;
+import com.viziq.backend.model.DatasetHealth;
+import com.viziq.backend.service.DatasetHealthService;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
 public class FileController {
+
+    @Autowired
+    private InsightService insightService;
+
+    @Autowired
+    private CorrelationService correlationService;
 
     @Autowired
     private CsvParserService csvParserService;
@@ -37,6 +50,9 @@ public class FileController {
 
     @Autowired
     private DatasetService datasetService;
+
+    @Autowired
+    private DatasetHealthService datasetHealthService;
 
     @PostMapping("/upload")
     public String upload(
@@ -259,6 +275,82 @@ public class FileController {
 
 
     }
+
+    @GetMapping("/dataset-health")
+    public DatasetHealth datasetHealth()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(
+                        rows
+                );
+
+        int correlationCount =
+                correlationService.findCorrelations(
+                                rows,
+                                columns
+                        )
+                        .size();
+
+        return datasetHealthService
+                .calculateHealth(
+                        rows,
+                        columns,
+                        correlationCount
+                );
+    }
+
+
+    @GetMapping("/insights")
+    public List<Insight> insights()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(rows);
+
+        List<CorrelationResult> correlations =
+                correlationService.findCorrelations(
+                        rows,
+                        columns
+                );
+
+        return insightService
+                .generateInsights(
+                        columns,
+                        correlations
+                );
+    }
+
+    @GetMapping("/correlations")
+    public List<CorrelationResult> correlations()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(
+                        rows
+                );
+
+        return correlationService.findCorrelations(
+                rows,
+                columns
+        );
+    }
+
     @GetMapping("/city-chart")
     public Map<String, Integer> cityChart()
             throws Exception {
