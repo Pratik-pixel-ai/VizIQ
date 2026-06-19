@@ -11,6 +11,8 @@ import java.util.Map;
 @Service
 public class InsightService {
 
+
+
     public List<Insight> generateInsights(
             Map<String, String> columns,
             List<CorrelationResult> correlations

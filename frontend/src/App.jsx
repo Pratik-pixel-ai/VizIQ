@@ -9,6 +9,33 @@ const formatChartName = (name) => {
     .replace(/\b\w/g, c => c.toUpperCase());
 
 };
+
+const downloadReport = async () => {
+
+    const response = await fetch(
+        "http://localhost:8080/api/report"
+    );
+
+    const blob = await response.blob();
+
+    const url =
+        window.URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        "VizIQ_Report.pdf";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+};
+
 function App() {
   const [rows, setRows] = useState([]);
   const [stats, setStats] = useState({});
@@ -25,6 +52,32 @@ function App() {
   const [sizeColumn, setSizeColumn] = useState("");
   const [chartType, setChartType] = useState("BAR");
   const [recommendedChart, setRecommendedChart] = useState("");
+  const [summary, setSummary] =
+    useState(null);
+  const [missingValues, setMissingValues] =
+    useState([]);
+  const [outliers, setOutliers] =
+      useState([]);
+      const groupedOutliers =
+          outliers.reduce(
+            (acc, outlier) => {
+
+              if (
+                !acc[outlier.column]
+              ) {
+
+                acc[outlier.column] = [];
+
+              }
+
+              acc[outlier.column]
+                .push(outlier);
+
+              return acc;
+
+            },
+            {}
+          );
   const getRecommendedChart = (column) => {
 
    axios
@@ -93,6 +146,7 @@ function App() {
       .then((response) => {
         setCharts(response.data);
       });
+
   axios
     .get(
       "http://localhost:8080/api/dataset-health"
@@ -110,6 +164,29 @@ function App() {
       .then((response) => {
         setInsights(response.data);
       });
+  axios
+    .get(
+      "http://localhost:8080/api/summary"
+    )
+    .then((response) => {
+
+      setSummary(
+        response.data
+      );
+
+    });
+
+    axios
+      .get(
+        "http://localhost:8080/api/outliers"
+      )
+      .then((response) => {
+
+        setOutliers(
+          response.data
+        );
+
+      });
 
     axios
       .get("http://localhost:8080/api/correlations")
@@ -120,6 +197,20 @@ function App() {
         );
 
       });
+  axios
+    .get("http://localhost:8080/api/missing-values")
+    .then((response) => {
+
+      console.log(
+        "Missing Values:",
+        response.data
+      );
+
+      setMissingValues(
+        response.data
+      );
+
+    });
 
   }, []);
 
@@ -147,6 +238,19 @@ function App() {
     <div style={{ padding: "20px" }}>
 
       <h1>VizIQ Dashboard</h1>
+      <button
+        onClick={downloadReport}
+        style={{
+          padding: "12px 20px",
+          borderRadius: "10px",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: "bold",
+          marginBottom: "20px"
+        }}
+      >
+        📄 Generate PDF Report
+      </button>
 
       <div style={{ marginBottom: "20px" }}>
         <input
@@ -198,6 +302,8 @@ function App() {
           marginBottom: "20px"
         }}
       >
+
+
         <h2>Detected Columns</h2>
 
         <ul>
@@ -424,6 +530,50 @@ function App() {
   }}
 >
 
+    {summary && (
+
+      <div
+        style={{
+          border: "1px solid #333",
+          borderRadius: "12px",
+          padding: "20px",
+          marginBottom: "30px",
+          background: "#07162d"
+        }}
+      >
+
+        <h2>
+          📊 Dataset Overview
+        </h2>
+
+        <p>
+          Rows: {summary.rows}
+        </p>
+
+        <p>
+          Columns: {summary.columns}
+        </p>
+
+        <p>
+          Numeric Columns: {summary.numericColumns}
+        </p>
+
+        <p>
+          Categorical Columns: {summary.categoricalColumns}
+        </p>
+
+        <p>
+          Missing Values: {summary.missingValues}
+        </p>
+
+        <p>
+          Outliers: {summary.outliers}
+        </p>
+
+      </div>
+
+    )}
+
     {datasetHealth && (
 
       <div
@@ -464,9 +614,206 @@ function App() {
 
         </h3>
 
+        <div
+          style={{
+            marginTop: "20px",
+            textAlign: "left",
+            maxWidth: "300px",
+            margin: "20px auto 0"
+          }}
+        >
+
+          <p>
+            📊 Dataset Size:
+            {" "}
+            {datasetHealth.datasetSizeScore}/25
+          </p>
+
+          <p>
+            🔢 Numeric Quality:
+            {" "}
+            {datasetHealth.numericQualityScore}/20
+          </p>
+
+          <p>
+            🔗 Relationships:
+            {" "}
+            {datasetHealth.relationshipScore}/15
+          </p>
+
+          <p>
+            🌈 Diversity:
+            {" "}
+            {datasetHealth.diversityScore}/15
+          </p>
+
+          <p>
+            📋 Completeness:
+            {" "}
+            {datasetHealth.completenessScore}/25
+          </p>
+
+        </div>
+
       </div>
 
     )}
+
+<div
+  style={{
+    marginBottom: "30px"
+  }}
+>
+
+  <h2>
+    Dataset Quality
+  </h2>
+
+  {missingValues.length === 0 ? (
+
+    <div
+      style={{
+        padding: "15px",
+        border: "1px solid #333",
+        borderRadius: "10px"
+      }}
+    >
+      ✅ No missing values detected
+    </div>
+
+  ) : (
+
+    missingValues.map(
+      (item, index) => (
+
+        <div
+          key={index}
+          style={{
+            padding: "12px",
+            border: "1px solid #333",
+            borderRadius: "10px",
+            marginBottom: "10px"
+          }}
+        >
+
+          ⚠ {item.column}
+
+          {" : "}
+
+          <strong>
+            {item.missingCount}
+          </strong>
+
+          {" missing values"}
+
+        </div>
+
+      )
+    )
+
+  )}
+
+</div>
+
+
+
+<div
+  style={{
+    marginBottom: "30px"
+  }}
+>
+
+  <h2>
+    🚨 Potential Outliers
+  </h2>
+
+  {outliers.length === 0 ? (
+
+    <div
+      style={{
+        padding: "15px",
+        border: "1px solid #333",
+        borderRadius: "10px"
+      }}
+    >
+      ✅ No significant outliers detected
+    </div>
+
+  ) : (
+
+    Object.entries(
+      groupedOutliers
+    ).map(
+
+      ([column, items]) => (
+
+        <div
+          key={column}
+          style={{
+            border: "1px solid #333",
+            borderRadius: "12px",
+            padding: "15px",
+            marginBottom: "12px"
+          }}
+        >
+
+          <h3>
+            {column}
+          </h3>
+
+          <p>
+            Severity:
+            {" "}
+            <strong
+              style={{
+                color:
+                  items[0].severity === "Extreme"
+                    ? "#ff4d4d"
+                    : "#ffa500"
+              }}
+            >
+              {items[0].severity}
+            </strong>
+          </p>
+
+          <p>
+            Expected Range:
+            {" "}
+            {items[0].lowerBound.toFixed(2)}
+            {" → "}
+            {items[0].upperBound.toFixed(2)}
+          </p>
+
+          <p>
+            Outlier Values:
+          </p>
+
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0
+            }}
+          >
+
+            <p>
+              {items.map(item => item.value).join(" • ")}
+            </p>
+
+
+
+          </ul>
+
+        </div>
+
+      )
+
+    )
+
+  )}
+
+</div>
+
+
 
 
   <h2>
@@ -523,7 +870,7 @@ function App() {
         marginBottom: "30px"
       }}
     >
-      <h2>AI Insights</h2>
+      <h2>Smart Insights</h2>
 
       {insights.map((insight, index) => (
 

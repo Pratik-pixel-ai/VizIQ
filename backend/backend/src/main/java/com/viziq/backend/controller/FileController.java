@@ -24,11 +24,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.viziq.backend.model.CorrelationResult;
 import com.viziq.backend.model.DatasetHealth;
 import com.viziq.backend.service.DatasetHealthService;
+import com.viziq.backend.model.MissingValueInfo;
+import com.viziq.backend.service.MissingValueService;
+import com.viziq.backend.model.OutlierInfo;
+import com.viziq.backend.service.OutlierDetectionService;
+import com.viziq.backend.service.SummaryService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import com.viziq.backend.model.SummaryInfo;
+import com.viziq.backend.model.SummaryInfo;
+import com.viziq.backend.model.MissingValueInfo;
+import com.viziq.backend.service.InsightGeneratorService;
+import com.viziq.backend.service.PdfReportService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import com.viziq.backend.model.OutlierInfo;
+
+
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
 public class FileController {
+
+
+    @Autowired
+    private InsightGeneratorService insightGeneratorService;
+
+    @Autowired
+    private MissingValueService missingValueService;
 
     @Autowired
     private InsightService insightService;
@@ -53,6 +79,18 @@ public class FileController {
 
     @Autowired
     private DatasetHealthService datasetHealthService;
+
+    @Autowired
+    private SummaryService summaryService;
+
+    @Autowired
+    private OutlierDetectionService
+            outlierDetectionService;
+
+    @Autowired
+    private PdfReportService pdfReportService;
+
+
 
     @PostMapping("/upload")
     public String upload(
@@ -141,6 +179,182 @@ public class FileController {
 
         return result;
     }
+
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> report()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(
+                        rows
+                );
+
+        int missingValues =
+                missingValueService
+                        .findMissingValues(rows)
+                        .stream()
+                        .mapToInt(
+                                MissingValueInfo::getMissingCount
+                        )
+                        .sum();
+
+        int outliers =
+                outlierDetectionService
+                        .detectOutliers(
+                                rows,
+                                columns
+                        )
+                        .size();
+
+        SummaryInfo summary =
+                summaryService.generateSummary(
+                        rows,
+                        columns,
+                        missingValues,
+                        outliers
+                );
+        int correlationCount =
+                correlationService
+                        .findCorrelations(
+                                rows,
+                                columns
+                        )
+                        .size();
+
+        DatasetHealth health =
+                datasetHealthService
+                        .calculateHealth(
+                                rows,
+                                columns,
+                                correlationCount
+                        );
+        List<CorrelationResult> correlations =
+                correlationService.findCorrelations(
+                        rows,
+                        columns
+                );
+
+        List<Insight> insights =
+                insightService.generateInsights(
+                        columns,
+                        correlations
+                );
+
+        List<ChartRecommendation> charts =
+                chartRecommendationService
+                        .recommendCharts(columns);
+
+        List<OutlierInfo> outlierList =
+                outlierDetectionService
+                        .detectOutliers(
+                                rows,
+                                columns
+                        );
+
+
+
+        byte[] pdf =
+                pdfReportService.generatePdf(
+                        summary,
+                        health,
+                        insights,
+                        correlations,
+                        charts,
+                        outlierList
+                );
+
+        return ResponseEntity.ok()
+
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=VizIQ_Report.pdf"
+                )
+
+                .contentType(
+                        MediaType.APPLICATION_PDF
+                )
+
+                .body(pdf);
+    }
+
+    @GetMapping("/summary")
+    public SummaryInfo summary()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(
+                        rows
+                );
+
+        int missingValues =
+                missingValueService
+                        .findMissingValues(rows)
+                        .stream()
+                        .mapToInt(
+                                MissingValueInfo::getMissingCount
+                        )
+                        .sum();
+
+        int outliers =
+                outlierDetectionService
+                        .detectOutliers(
+                                rows,
+                                columns
+                        )
+                        .size();
+
+        return summaryService.generateSummary(
+                rows,
+                columns,
+                missingValues,
+                outliers
+        );
+    }
+    @GetMapping("/missing-values")
+    public List<MissingValueInfo> missingValues()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        return missingValueService
+                .findMissingValues(rows);
+    }
+
+    @GetMapping("/outliers")
+    public List<OutlierInfo> outliers()
+            throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService
+                                .getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService
+                        .detectColumns(rows);
+
+        return outlierDetectionService
+                .detectOutliers(
+                        rows,
+                        columns
+                );
+    }
+
+
     @GetMapping("/line-data")
     public List<Map<String, Double>> lineData(
             @RequestParam String xColumn,
@@ -225,6 +439,8 @@ public class FileController {
 
         return result;
     }
+
+
     @GetMapping("/preview")
     public List<String[]> preview()
             throws Exception {
@@ -316,7 +532,9 @@ public class FileController {
                 );
 
         Map<String, String> columns =
-                columnDetectorService.detectColumns(rows);
+                columnDetectorService.detectColumns(
+                        rows
+                );
 
         List<CorrelationResult> correlations =
                 correlationService.findCorrelations(
@@ -324,11 +542,37 @@ public class FileController {
                         columns
                 );
 
-        return insightService
-                .generateInsights(
-                        columns,
-                        correlations
-                );
+        int missingValues =
+                missingValueService
+                        .findMissingValues(rows)
+                        .stream()
+                        .mapToInt(
+                                MissingValueInfo::getMissingCount
+                        )
+                        .sum();
+
+        int outlierCount =
+                outlierDetectionService
+                        .detectOutliers(
+                                rows,
+                                columns
+                        )
+                        .size();
+
+        DatasetHealth health =
+                datasetHealthService
+                        .calculateHealth(
+                                rows,
+                                columns,
+                                correlations.size()
+                        );
+
+        return insightGeneratorService.generateInsights(
+                health.getScore(),
+                missingValues,
+                outlierCount,
+                correlations
+        );
     }
 
     @GetMapping("/correlations")
