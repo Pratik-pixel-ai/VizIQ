@@ -10,17 +10,14 @@ import com.viziq.backend.service.DatasetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.HashMap;
+import com.viziq.backend.model.ChartRecommendation;
 import java.util.Map;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
@@ -246,7 +243,7 @@ public class FileController {
     }
 
     @GetMapping("/charts")
-    public List<String> charts()
+    public List<ChartRecommendation> charts()
             throws Exception {
 
         List<String[]> rows =

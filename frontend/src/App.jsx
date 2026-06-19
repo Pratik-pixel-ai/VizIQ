@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BarChartView from "./components/BarChartView";
+const formatChartName = (name) => {
 
+  return name
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+
+};
 function App() {
   const [rows, setRows] = useState([]);
   const [stats, setStats] = useState({});
@@ -379,10 +386,25 @@ function App() {
       >
         <h2>Recommended Charts</h2>
 
-        <ul>
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0
+          }}
+        >
           {charts.map((chart, index) => (
-            <li key={index}>
-              {chart}
+           <li
+             key={index}
+             style={{
+               marginBottom: "20px"
+             }}
+           >
+              <strong>
+                #{index + 1} {formatChartName(chart.chartType)}
+              </strong>
+              {" "}({chart.score})
+              <br />
+              {chart.reason}
             </li>
           ))}
         </ul>
