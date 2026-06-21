@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { tooltipStyle, axisProps, gridProps, palette } from "../chartTheme";
 
-function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yColumn, sizeColumn }) {
+function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yColumn, sizeColumn, height = 380 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -21,13 +21,14 @@ function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yC
     });
   }, [selectedColumn]);
 
-  if (chartType === "HISTOGRAM") return <HistogramView selectedColumn={selectedColumn} />;
-  if (chartType === "AREA") return <AreaChartView xColumn={xColumn} yColumn={yColumn} />;
-  if (chartType === "LINE") return <LineChartView xColumn={xColumn} yColumn={yColumn} />;
+  if (chartType === "HISTOGRAM") return <HistogramView selectedColumn={selectedColumn} height={height} />;
+  if (chartType === "AREA") return <AreaChartView xColumn={xColumn} yColumn={yColumn} height={height} />;
+  if (chartType === "LINE") return <LineChartView xColumn={xColumn} yColumn={yColumn} height={height} />;
   if (chartType === "BOXPLOT") return <BoxPlotView selectedColumn={selectedColumn} />;
-  if (chartType === "BUBBLE") return <BubbleChartView xColumn={xColumn} yColumn={yColumn} sizeColumn={sizeColumn} />;
-  if (chartType === "SCATTER") return <ScatterPlotView xColumn={xColumn} yColumn={yColumn} />;
-  if (chartType === "HEATMAP") return <HeatMapView xColumn={xColumn} yColumn={yColumn} />;
+  if (chartType === "BUBBLE")
+    return <BubbleChartView xColumn={xColumn} yColumn={yColumn} sizeColumn={sizeColumn} height={height} />;
+  if (chartType === "SCATTER") return <ScatterPlotView xColumn={xColumn} yColumn={yColumn} height={height} />;
+  if (chartType === "HEATMAP") return <HeatMapView xColumn={xColumn} yColumn={yColumn} height={height + 180} />;
 
   if (chartType === "PIE") {
     if (!selectedColumn) {
@@ -44,9 +45,9 @@ function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yC
       );
     }
     return (
-      <ResponsiveContainer width="100%" height={380}>
+      <ResponsiveContainer width="100%" height={height}>
         <PieChart>
-          <Pie data={data} dataKey="count" nameKey="name" outerRadius={120} label>
+          <Pie data={data} dataKey="count" nameKey="name" outerRadius={Math.min(height, 380) / 3.1} label>
             {data.map((_, index) => (
               <Cell key={index} fill={palette[index % palette.length]} />
             ))}
@@ -63,7 +64,7 @@ function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yC
   }
 
   return (
-    <ResponsiveContainer width="100%" height={380}>
+    <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data.slice(0, 15)}>
         <CartesianGrid {...gridProps} />
         <XAxis dataKey="name" {...axisProps} />

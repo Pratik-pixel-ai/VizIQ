@@ -29,7 +29,7 @@ export default function HealthSection({ datasetHealth }) {
   if (!datasetHealth) return null;
 
   return (
-    <Card title="Dataset Health" icon={HeartPulse}>
+    <Card title="Dataset Health" icon={HeartPulse} tone="good">
       <div className="flex flex-col md:flex-row items-center gap-8">
         <div className="flex flex-col items-center gap-3 shrink-0">
           <HealthGauge score={datasetHealth.score} status={datasetHealth.status} />

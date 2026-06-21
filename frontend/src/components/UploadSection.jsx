@@ -15,7 +15,7 @@ export default function UploadSection({ setFile, uploadFile }) {
   };
 
   return (
-    <Card>
+    <Card title="Upload Dataset" icon={UploadCloud} tone="accent">
       <div
         onDragOver={(e) => {
           e.preventDefault();

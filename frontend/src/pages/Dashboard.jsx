@@ -36,12 +36,12 @@ export default function Dashboard({
 
       <HealthSection datasetHealth={datasetHealth} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <SummarySection summary={summary} />
-        <DatasetQualitySection missingValues={missingValues} />
+        <DatasetQualitySection missingValues={missingValues} totalRows={Math.max(rows.length - 1, 0)} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <OutliersSection outliers={outliers} groupedOutliers={groupedOutliers} />
         <CorrelationSection correlations={correlations} />
       </div>

@@ -36,3 +36,15 @@ export const palette = [
   "#4F8CFF",
   "#FFC857",
 ];
+
+export const chartDescriptions = {
+  BAR: "Compares values across categories — best for ranking or spotting the biggest/smallest groups.",
+  PIE: "Shows each category's share of the whole. Works best with 10 or fewer categories.",
+  HISTOGRAM: "Groups numeric values into ranges to reveal the shape and spread of your data's distribution.",
+  SCATTER: "Plots two numeric variables against each other to surface correlation or clustering patterns.",
+  LINE: "Tracks how a value changes across a continuous axis — ideal for trends over time or sequence.",
+  AREA: "Like a line chart, but the filled area emphasizes magnitude and cumulative change.",
+  BUBBLE: "A scatter plot with a third dimension — bubble size encodes an extra numeric variable.",
+  BOXPLOT: "Summarizes a column's distribution: median, quartiles, range, and where outliers fall.",
+  HEATMAP: "Bins two numeric variables into a grid and colors by density — good for spotting hot zones.",
+};

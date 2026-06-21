@@ -13,7 +13,7 @@ export default function Layout({ activePage, setActivePage, theme, toggleTheme, 
           toggleTheme={toggleTheme}
           downloadReport={downloadReport}
         />
-        <main className="flex flex-col gap-5">{children}</main>
+        <main className="flex flex-col gap-6">{children}</main>
       </div>
     </div>
   );

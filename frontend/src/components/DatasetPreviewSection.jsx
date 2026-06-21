@@ -5,7 +5,7 @@ export default function DatasetPreviewSection({ rows }) {
   if (rows.length === 0) return null;
 
   return (
-    <Card title="Dataset Preview" icon={Table2}>
+    <Card title="Dataset Preview" icon={Table2} tone="neutral">
       <div className="overflow-auto rounded-xl border" style={{ borderColor: "var(--surface-border)", maxHeight: 420 }}>
         <table className="w-full text-sm border-collapse">
           <thead>

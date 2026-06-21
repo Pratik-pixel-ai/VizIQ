@@ -32,7 +32,7 @@ export default function ChartControlsSection({
   const numericCols = Object.entries(columns).filter(([, type]) => type === "NUMBER");
 
   return (
-    <Card title="Create Chart" icon={SlidersHorizontal}>
+    <Card title="Create Chart" icon={SlidersHorizontal} tone="accent">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Select label="Chart Type" value={chartType} onChange={(e) => setChartType(e.target.value)}>
           {CHART_TYPES.map((c) => (

@@ -14,7 +14,7 @@ export default function SummarySection({ summary }) {
   ];
 
   return (
-    <Card title="Dataset Overview" icon={BarChart2}>
+    <Card title="Dataset Overview" icon={BarChart2} tone="accent">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {items.map(({ label, value, icon: Icon }) => (
           <div

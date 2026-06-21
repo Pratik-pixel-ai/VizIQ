@@ -3,7 +3,7 @@ import axios from "axios";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
 
-function LineChartView({ xColumn, yColumn }) {
+function LineChartView({ xColumn, yColumn, height = 380 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ function LineChartView({ xColumn, yColumn }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={380}>
+    <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data}>
         <CartesianGrid {...gridProps} />
         <XAxis dataKey="x" {...axisProps} />
