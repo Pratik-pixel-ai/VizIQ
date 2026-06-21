@@ -4,29 +4,10 @@ import BarChartView from "./components/BarChartView";
 
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-import HealthSection from "./components/HealthSection";
-import InsightsSection
-from "./components/InsightsSection";
-import SummarySection
-from "./components/SummarySection";
-import CorrelationSection
-from "./components/CorrelationSection";
-import RecommendedChartsSection
-from "./components/RecommendedChartsSection";
-import OutliersSection
-from "./components/OutliersSection";
-import DatasetPreviewSection
-from "./components/DatasetPreviewSection";
-import ChartControlsSection
-from "./components/ChartControlsSection";
-import DatasetQualitySection
-from "./components/DatasetQualitySection";
-import UploadSection
-from "./components/UploadSection";
-import StatsCardsSection
-from "./components/StatsCardsSection";
-import BarChartSection
-from "./components/BarChartSection";
+
+
+import Charts from "./pages/Charts";
+
 
 
 
@@ -85,6 +66,8 @@ function App() {
     useState(null);
   const [missingValues, setMissingValues] =
     useState([]);
+    const [activePage, setActivePage] =
+        useState("dashboard");
   const [outliers, setOutliers] =
       useState([]);
       const groupedOutliers =
@@ -267,6 +250,22 @@ function App() {
     <div style={{ padding: "20px" }}>
 
       <h1>VizIQ Dashboard</h1>
+
+      <button
+          onClick={() =>
+              setActivePage("dashboard")
+          }
+      >
+          Dashboard
+      </button>
+
+      <button
+          onClick={() =>
+              setActivePage("charts")
+          }
+      >
+          Charts
+      </button>
       <button
         onClick={downloadReport}
         style={{
@@ -300,51 +299,47 @@ function App() {
         </ul>
       </div>
 
-    <ChartControlsSection
-            chartType={chartType}
-            setChartType={setChartType}
-            xColumn={xColumn}
-            setXColumn={setXColumn}
-            yColumn={yColumn}
-            setYColumn={setYColumn}
-            sizeColumn={sizeColumn}
-            setSizeColumn={setSizeColumn}
-            selectedColumn={selectedColumn}
-            setSelectedColumn={setSelectedColumn}
-            columns={columns}
-            getRecommendedChart={getRecommendedChart}
-        />
+      {activePage === "dashboard" && (
+          <Dashboard
+                    rows={rows}
+                    summary={summary}
+                    datasetHealth={datasetHealth}
+                    missingValues={missingValues}
+                    outliers={outliers}
+                    groupedOutliers={groupedOutliers}
+                    correlations={correlations}
+                    insights={insights}
+                    charts={charts}
+                    setChartType={setChartType}
+                    formatChartName={formatChartName}
+                    setFile={setFile}
+                    uploadFile={uploadFile}
+                />
+      )}
 
-      <div
-        style={{
-          border: "1px solid white",
-          padding: "20px",
-          marginBottom: "20px"
-        }}
-      >
-
-<div
-  style={{
-    marginBottom: "30px"
-  }}
->
-<BarChartSection
-    selectedColumn={selectedColumn}
-    chartType={chartType}
-    recommendedChart={recommendedChart}
-    xColumn={xColumn}
-    yColumn={yColumn}
-    sizeColumn={sizeColumn}
-/>
-
-      <DatasetPreviewSection
-          rows={rows}
-      />
+      {activePage === "charts" && (
+          <Charts
+              chartType={chartType}
+              setChartType={setChartType}
+              xColumn={xColumn}
+              setXColumn={setXColumn}
+              yColumn={yColumn}
+              setYColumn={setYColumn}
+              sizeColumn={sizeColumn}
+              setSizeColumn={setSizeColumn}
+              selectedColumn={selectedColumn}
+              setSelectedColumn={setSelectedColumn}
+              columns={columns}
+              getRecommendedChart={getRecommendedChart}
+              recommendedChart={recommendedChart}
+              rows={rows}
+          />
+      )}
 
 
 
-    </div>
-  );
+  </div>
+);
 }
 
 export default App;
