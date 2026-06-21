@@ -51,16 +51,7 @@ public class MissingValueService {
                 );
 
             }
-            if (missingCount > 0) {
 
-                results.add(
-                        new MissingValueInfo(
-                                headers[col],
-                                missingCount
-                        )
-                );
-
-            }
 
         }
 
