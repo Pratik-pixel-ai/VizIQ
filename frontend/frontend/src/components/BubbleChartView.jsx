@@ -3,7 +3,7 @@ import axios from "axios";
 import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
 
-function BubbleChartView({ xColumn, yColumn, sizeColumn }) {
+function BubbleChartView({ xColumn, yColumn, sizeColumn, height = 420 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function BubbleChartView({ xColumn, yColumn, sizeColumn }) {
     data.length > 10000 ? [2, 6] : data.length > 5000 ? [3, 8] : data.length > 1000 ? [4, 12] : data.length > 300 ? [5, 18] : [8, 25];
 
   return (
-    <ResponsiveContainer width="100%" height={420}>
+    <ResponsiveContainer width="100%" height={height}>
       <ScatterChart>
         <CartesianGrid {...gridProps} />
         <XAxis dataKey="x" type="number" domain={["auto", "auto"]} name={xColumn} {...axisProps} />

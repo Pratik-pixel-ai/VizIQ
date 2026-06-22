@@ -3,7 +3,7 @@ import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
 
-function HistogramView({ selectedColumn }) {
+function HistogramView({ selectedColumn, height = 380 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ function HistogramView({ selectedColumn }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={380}>
+    <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data}>
         <CartesianGrid {...gridProps} />
         <XAxis dataKey="range" {...axisProps} />

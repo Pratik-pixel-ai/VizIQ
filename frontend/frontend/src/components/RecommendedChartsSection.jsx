@@ -17,7 +17,7 @@ export default function RecommendedChartsSection({ charts, setChartType, formatC
   if (!charts || charts.length === 0) return null;
 
   return (
-    <Card title="Recommended Charts" icon={Wand2}>
+    <Card title="Recommended Charts" icon={Wand2} tone="accent">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {charts.map((chart, index) => (
           <button

@@ -12,23 +12,18 @@ const formatChartName = (name) =>
     .toLowerCase()
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
-const downloadReport = async () => {
-  const response = await fetch("http://localhost:8080/api/report");
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "VizIQ_Report.pdf";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-};
+
+
 
 function App() {
   const { theme, toggleTheme } = useTheme();
 
+
   const [rows, setRows] = useState([]);
+  const [isGeneratingPdf, setIsGeneratingPdf] =
+      useState(false);
   const [charts, setCharts] = useState([]);
+  const [metadata, setMetadata] = useState(null);
   const [insights, setInsights] = useState([]);
   const [correlations, setCorrelations] = useState([]);
   const [datasetHealth, setDatasetHealth] = useState(null);
@@ -44,6 +39,7 @@ function App() {
   const [missingValues, setMissingValues] = useState([]);
   const [activePage, setActivePage] = useState("dashboard");
   const [outliers, setOutliers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const groupedOutliers = outliers.reduce((acc, outlier) => {
     if (!acc[outlier.column]) acc[outlier.column] = [];
@@ -74,11 +70,63 @@ function App() {
     axios.get("http://localhost:8080/api/outliers").then((response) => setOutliers(response.data));
     axios.get("http://localhost:8080/api/correlations").then((response) => setCorrelations(response.data));
     axios.get("http://localhost:8080/api/missing-values").then((response) => setMissingValues(response.data));
+    axios.get("http://localhost:8080/api/metadata").then((response) => setMetadata(response.data)).catch(() => {});
   }, []);
+
+const downloadReport = async () => {
+    console.log("PDF STARTED");
+    setIsGeneratingPdf(true);
+  let chartBlob = null;
+  try {
+    const chartEl = document.querySelector("[data-chart-capture]");
+    if (chartEl) {
+      const html2canvas = (await import("html2canvas-pro")).default;
+      const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg-base").trim() || "#fff";
+      const canvas = await html2canvas(chartEl, { backgroundColor: bg, scale: 1.5, useCORS: true, logging: false });
+      chartBlob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+    }
+  } catch (e) {
+    console.warn("Chart capture skipped:", e);
+  }
+
+  const formData = new FormData();
+  if (chartBlob) {
+    formData.append("chartImage", chartBlob, "chart.jpg");
+  }
+
+  try {
+    const response = await fetch("http://localhost:8080/api/report", {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error(`Report request failed (${response.status})`);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "VizIQ_Report.pdf";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error("Report generation failed:", e);
+    alert("Failed to generate PDF report. Please try again.");
+  }
+  finally {
+
+      setIsGeneratingPdf(false);
+
+  }
+};
 
   const uploadFile = () => {
     const formData = new FormData();
     formData.append("file", file);
+    setLoading(true);
 
     axios
       .post("http://localhost:8080/api/upload", formData)
@@ -87,11 +135,13 @@ function App() {
       })
       .catch((error) => {
         console.error(error);
+        setLoading(false);
         alert("Upload Failed");
       });
   };
 
   return (
+      <>
     <Layout
       activePage={activePage}
       setActivePage={setActivePage}
@@ -116,6 +166,9 @@ function App() {
           formatChartName={formatChartName}
           setFile={setFile}
           uploadFile={uploadFile}
+          loading={loading}
+          metadata={metadata}
+          theme={theme}
         />
       )}
 
@@ -140,6 +193,14 @@ function App() {
         />
       )}
     </Layout>
+    {
+          true && (
+            <div className="loading-overlay">
+              <div className="spinner"></div>
+            </div>
+          )
+        }
+      </>
   );
 }
 

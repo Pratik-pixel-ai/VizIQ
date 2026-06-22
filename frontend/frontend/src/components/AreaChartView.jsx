@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
 
-function AreaChartView({ xColumn, yColumn }) {
+function AreaChartView({ xColumn, yColumn, height = 400 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ function AreaChartView({ xColumn, yColumn }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={400}>
+    <ResponsiveContainer width="100%" height={height}>
       <AreaChart data={data}>
         <defs>
           <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">

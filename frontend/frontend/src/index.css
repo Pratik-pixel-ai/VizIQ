@@ -33,6 +33,8 @@
   --accent-2-soft: rgba(0, 194, 168, 0.13);
   --warn: #ff8a3d;
   --warn-soft: rgba(255, 138, 61, 0.13);
+  --high: #ff5a4e;
+  --high-soft: rgba(255, 90, 78, 0.13);
   --danger: #ef4768;
   --danger-soft: rgba(239, 71, 104, 0.12);
 
@@ -65,6 +67,8 @@
   --accent-2-soft: rgba(0, 255, 163, 0.12);
   --warn: #ffa83d;
   --warn-soft: rgba(255, 168, 61, 0.14);
+  --high: #ff7a4a;
+  --high-soft: rgba(255, 122, 74, 0.15);
   --danger: #ff5577;
   --danger-soft: rgba(255, 85, 119, 0.14);
 
@@ -138,14 +142,15 @@ h1, h2, h3, h4 {
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   box-shadow: var(--shadow-glass);
-  border-radius: 20px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  border-radius: 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .glass-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-glass-lg);
   background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--surface-border));
 }
 
 .mono-num {

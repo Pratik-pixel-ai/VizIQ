@@ -1,6 +1,7 @@
 const TONES = {
   good: { bg: "var(--accent-2-soft)", fg: "var(--accent-2)" },
   warn: { bg: "var(--warn-soft)", fg: "var(--warn)" },
+  high: { bg: "var(--high-soft)", fg: "var(--high)" },
   danger: { bg: "var(--danger-soft)", fg: "var(--danger)" },
   accent: { bg: "var(--accent-soft)", fg: "var(--accent)" },
   neutral: { bg: "var(--surface-strong)", fg: "var(--text-secondary)" },

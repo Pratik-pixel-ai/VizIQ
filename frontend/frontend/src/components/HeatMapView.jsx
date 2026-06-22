@@ -2,7 +2,7 @@ import { ResponsiveHeatMap } from "@nivo/heatmap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-function HeatMapView({ xColumn, yColumn }) {
+function HeatMapView({ xColumn, yColumn, height = 560 }) {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ function HeatMapView({ xColumn, yColumn }) {
   }
 
   return (
-    <div style={{ height: 560 }}>
+    <div style={{ height }}>
       <h3 className="text-sm font-semibold text-[var(--text-secondary)] mb-4 text-center">
         {xColumn} vs {yColumn}
       </h3>

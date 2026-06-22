@@ -70,7 +70,7 @@ export default function BarChartSection({ selectedColumn, chartType, recommended
   const chartNode = (variant, height) => {
     const ref = variant === "fullscreen" ? fullscreenChartRef : chartRef;
     return (
-      <div ref={ref} className="rounded-xl" style={{ background: "var(--bg-base)" }}>
+      <div ref={ref} className="rounded-xl" style={{ background: "var(--bg-base)" }} data-chart-capture>
         <BarChartView
           selectedColumn={selectedColumn}
           chartType={chartType}

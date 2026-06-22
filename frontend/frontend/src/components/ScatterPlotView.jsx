@@ -3,7 +3,7 @@ import axios from "axios";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
 
-function ScatterPlotView({ xColumn, yColumn }) {
+function ScatterPlotView({ xColumn, yColumn, height = 380 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function ScatterPlotView({ xColumn, yColumn }) {
   const pointSize = data.length > 5000 ? 1.5 : data.length > 1000 ? 2.5 : data.length > 300 ? 3.5 : 5;
 
   return (
-    <ResponsiveContainer width="100%" height={380}>
+    <ResponsiveContainer width="100%" height={height}>
       <ScatterChart>
         <CartesianGrid {...gridProps} />
         <XAxis dataKey="x" name={xColumn} {...axisProps} />

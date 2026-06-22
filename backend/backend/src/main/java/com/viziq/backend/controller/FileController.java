@@ -115,9 +115,95 @@ public class FileController {
                 destination.getAbsolutePath()
         );
 
+        // Store metadata for dashboard card and PDF
+        datasetService.setMetadata(
+                file.getOriginalFilename(),
+                file.getSize()
+        );
+
         System.out.println("PATH = " + destination.getAbsolutePath());
 
         return "Uploaded : " + file.getOriginalFilename();
+    }
+
+    @GetMapping("/metadata")
+    public java.util.Map<String, String> metadata() {
+        java.util.Map<String, String> m = new java.util.LinkedHashMap<>();
+        m.put("filename",   datasetService.getFilename());
+        m.put("uploadedAt", datasetService.getUploadedAt());
+        m.put("fileSize",   datasetService.getFileSizeFormatted());
+        return m;
+    }
+
+    @PostMapping(value = "/report", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> report(
+            @RequestParam(value = "chartImage", required = false) MultipartFile chartImage
+    ) throws Exception {
+
+        List<String[]> rows =
+                csvParserService.readCsv(
+                        datasetService.getCurrentDatasetPath()
+                );
+
+        Map<String, String> columns =
+                columnDetectorService.detectColumns(
+                        rows
+                );
+
+        List<MissingValueInfo> missingValueList =
+                missingValueService.findMissingValues(rows);
+
+        int missingValues = missingValueList.stream()
+                .mapToInt(MissingValueInfo::getMissingCount)
+                .sum();
+
+        int outliers =
+                outlierDetectionService
+                        .detectOutliers(rows, columns)
+                        .size();
+
+        SummaryInfo summary =
+                summaryService.generateSummary(
+                        rows, columns, missingValues, outliers
+                );
+
+        int correlationCount =
+                correlationService.findCorrelations(rows, columns).size();
+
+        DatasetHealth health =
+                datasetHealthService.calculateHealth(rows, columns, correlationCount);
+
+        List<CorrelationResult> correlations =
+                correlationService.findCorrelations(rows, columns);
+
+        List<Insight> insights =
+                insightService.generateInsights(columns, correlations);
+
+        List<ChartRecommendation> charts =
+                chartRecommendationService.recommendCharts(columns);
+
+        List<OutlierInfo> outlierList =
+                outlierDetectionService.detectOutliers(rows, columns);
+
+        byte[] chartImageBytes = null;
+        if (chartImage != null && !chartImage.isEmpty()) {
+            chartImageBytes = chartImage.getBytes();
+        }
+
+        byte[] pdf =
+                pdfReportService.generatePdf(
+                        summary, health, insights, correlations, charts, outlierList,
+                        missingValueList, columns,
+                        datasetService.getFilename(),
+                        datasetService.getUploadedAt(),
+                        datasetService.getFileSizeFormatted(),
+                        chartImageBytes
+                );
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=VizIQ_Report.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 
     @GetMapping("/scatter-data")
@@ -178,108 +264,6 @@ public class FileController {
         }
 
         return result;
-    }
-
-    @GetMapping("/report")
-    public ResponseEntity<byte[]> report()
-            throws Exception {
-
-        List<String[]> rows =
-                csvParserService.readCsv(
-                        datasetService.getCurrentDatasetPath()
-                );
-
-        Map<String, String> columns =
-                columnDetectorService.detectColumns(
-                        rows
-                );
-
-        int missingValues =
-                missingValueService
-                        .findMissingValues(rows)
-                        .stream()
-                        .mapToInt(
-                                MissingValueInfo::getMissingCount
-                        )
-                        .sum();
-
-        int outliers =
-                outlierDetectionService
-                        .detectOutliers(
-                                rows,
-                                columns
-                        )
-                        .size();
-
-        SummaryInfo summary =
-                summaryService.generateSummary(
-                        rows,
-                        columns,
-                        missingValues,
-                        outliers
-                );
-        int correlationCount =
-                correlationService
-                        .findCorrelations(
-                                rows,
-                                columns
-                        )
-                        .size();
-
-        DatasetHealth health =
-                datasetHealthService
-                        .calculateHealth(
-                                rows,
-                                columns,
-                                correlationCount
-                        );
-        List<CorrelationResult> correlations =
-                correlationService.findCorrelations(
-                        rows,
-                        columns
-                );
-
-        List<Insight> insights =
-                insightService.generateInsights(
-                        columns,
-                        correlations
-                );
-
-        List<ChartRecommendation> charts =
-                chartRecommendationService
-                        .recommendCharts(columns);
-
-        List<OutlierInfo> outlierList =
-                outlierDetectionService
-                        .detectOutliers(
-                                rows,
-                                columns
-                        );
-
-
-
-        byte[] pdf =
-                pdfReportService.generatePdf(
-                        summary,
-                        health,
-                        insights,
-                        correlations,
-                        charts,
-                        outlierList
-                );
-
-        return ResponseEntity.ok()
-
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=VizIQ_Report.pdf"
-                )
-
-                .contentType(
-                        MediaType.APPLICATION_PDF
-                )
-
-                .body(pdf);
     }
 
     @GetMapping("/summary")

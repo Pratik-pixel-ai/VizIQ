@@ -8,7 +8,7 @@ export default function DetectedColumnsSection({ columns }) {
   if (entries.length === 0) return null;
 
   return (
-    <Card title="Detected Columns" icon={Columns3}>
+    <Card title="Detected Columns" icon={Columns3} tone="neutral">
       <div className="flex flex-wrap gap-2">
         {entries.map(([name, type]) => {
           const Icon = TYPE_ICON[type] || Type;

@@ -2,10 +2,11 @@ import { TriangleAlert } from "lucide-react";
 import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 import EmptyState from "./ui/EmptyState";
+import { getOutlierTone } from "../utils/severity";
 
 export default function OutliersSection({ outliers, groupedOutliers }) {
   return (
-    <Card title="Potential Outliers" icon={TriangleAlert}>
+    <Card title="Potential Outliers" icon={TriangleAlert} tone="danger">
       {outliers.length === 0 ? (
         <EmptyState message="No significant outliers detected" />
       ) : (
@@ -18,9 +19,7 @@ export default function OutliersSection({ outliers, groupedOutliers }) {
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-bold text-[var(--text-primary)]">{column}</h3>
-                <Badge tone={items[0].severity === "Extreme" ? "danger" : "warn"}>
-                  {items[0].severity}
-                </Badge>
+                <Badge tone={getOutlierTone(items[0].severity)}>{items[0].severity}</Badge>
               </div>
               <p className="text-xs text-[var(--text-secondary)] mb-2">
                 Expected range:{" "}
