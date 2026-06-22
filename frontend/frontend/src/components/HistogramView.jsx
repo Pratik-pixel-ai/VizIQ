@@ -9,7 +9,7 @@ function HistogramView({ selectedColumn, height = 380 }) {
   useEffect(() => {
     if (!selectedColumn) return;
     axios
-      .get(`http://localhost:8080/api/histogram-data?column=${selectedColumn}`)
+      .get(`https://viziq-production.up.railway.app/api/histogram-data?column=${selectedColumn}`)
       .then((response) => setData(response.data));
   }, [selectedColumn]);
 

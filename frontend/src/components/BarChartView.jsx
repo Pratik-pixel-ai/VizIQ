@@ -15,7 +15,7 @@ function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yC
 
   useEffect(() => {
     if (!selectedColumn) return;
-    axios.get(`http://localhost:8080/api/chart-data?column=${selectedColumn}`).then((response) => {
+    axios.get(`https://viziq-production.up.railway.app/api/chart-data?column=${selectedColumn}`).then((response) => {
       const chartData = Object.entries(response.data).map(([name, count]) => ({ name, count }));
       setData(chartData);
     });

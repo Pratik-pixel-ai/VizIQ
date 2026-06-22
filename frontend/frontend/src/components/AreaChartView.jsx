@@ -9,7 +9,7 @@ function AreaChartView({ xColumn, yColumn, height = 400 }) {
   useEffect(() => {
     if (!xColumn || !yColumn) return;
     axios
-      .get(`http://localhost:8080/api/line-data?xColumn=${xColumn}&yColumn=${yColumn}`)
+      .get(`https://viziq-production.up.railway.app/api/line-data?xColumn=${xColumn}&yColumn=${yColumn}`)
       .then((response) => setData(response.data));
   }, [xColumn, yColumn]);
 

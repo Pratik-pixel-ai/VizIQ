@@ -49,7 +49,7 @@ function App() {
 
   const getRecommendedChart = (column) => {
     axios
-      .get(`http://localhost:8080/api/recommend-chart?column=${column}`)
+      .get(`https://viziq-production.up.railway.app/api/recommend-chart?column=${column}`)
       .then((response) => {
         setRecommendedChart(response.data);
 
@@ -61,16 +61,16 @@ function App() {
   };
 
   useEffect(() => {
-    axios.get("http://localhost:8080/api/columns").then((response) => setColumns(response.data));
-    axios.get("http://localhost:8080/api/preview").then((response) => setRows(response.data));
-    axios.get("http://localhost:8080/api/charts").then((response) => setCharts(response.data));
-    axios.get("http://localhost:8080/api/dataset-health").then((response) => setDatasetHealth(response.data));
-    axios.get("http://localhost:8080/api/insights").then((response) => setInsights(response.data));
-    axios.get("http://localhost:8080/api/summary").then((response) => setSummary(response.data));
-    axios.get("http://localhost:8080/api/outliers").then((response) => setOutliers(response.data));
-    axios.get("http://localhost:8080/api/correlations").then((response) => setCorrelations(response.data));
-    axios.get("http://localhost:8080/api/missing-values").then((response) => setMissingValues(response.data));
-    axios.get("http://localhost:8080/api/metadata").then((response) => setMetadata(response.data)).catch(() => {});
+    axios.get("https://viziq-production.up.railway.app/api/columns").then((response) => setColumns(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/preview").then((response) => setRows(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/charts").then((response) => setCharts(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/dataset-health").then((response) => setDatasetHealth(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/insights").then((response) => setInsights(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/summary").then((response) => setSummary(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/outliers").then((response) => setOutliers(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/correlations").then((response) => setCorrelations(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/missing-values").then((response) => setMissingValues(response.data));
+    axios.get("https://viziq-production.up.railway.app/api/metadata").then((response) => setMetadata(response.data)).catch(() => {});
   }, []);
 
 const downloadReport = async () => {
@@ -95,7 +95,7 @@ const downloadReport = async () => {
   }
 
   try {
-    const response = await fetch("http://localhost:8080/api/report", {
+    const response = await fetch("https://viziq-production.up.railway.app/api/report", {
       method: "POST",
       body: formData,
     });
@@ -129,7 +129,7 @@ const downloadReport = async () => {
     setLoading(true);
 
     axios
-      .post("http://localhost:8080/api/upload", formData)
+      .post("https://viziq-production.up.railway.app/api/upload", formData)
       .then(() => {
         window.location.reload();
       })

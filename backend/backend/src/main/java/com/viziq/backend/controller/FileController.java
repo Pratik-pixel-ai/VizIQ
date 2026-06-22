@@ -100,7 +100,13 @@ public class FileController {
         System.out.println("UPLOAD API HIT");
         System.out.println("FILE = " + file.getOriginalFilename());
 
-        File folder = new File("D:/VizIQ/uploads");
+        String uploadDir = System.getProperty("java.io.tmpdir");
+
+        File folder = new File(uploadDir);
+
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
 
         if (!folder.exists()) {
             folder.mkdirs();

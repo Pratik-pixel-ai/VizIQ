@@ -7,7 +7,7 @@ function BoxPlotView({ selectedColumn }) {
   useEffect(() => {
     if (!selectedColumn) return;
     axios
-      .get(`http://localhost:8080/api/boxplot-data?column=${selectedColumn}`)
+      .get(`https://viziq-production.up.railway.app/api/boxplot-data?column=${selectedColumn}`)
       .then((response) => setStats(response.data));
   }, [selectedColumn]);
 

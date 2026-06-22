@@ -9,7 +9,7 @@ function BubbleChartView({ xColumn, yColumn, sizeColumn, height = 420 }) {
   useEffect(() => {
     if (!xColumn || !yColumn || !sizeColumn) return;
     axios
-      .get(`http://localhost:8080/api/bubble-data?xColumn=${xColumn}&yColumn=${yColumn}&sizeColumn=${sizeColumn}`)
+      .get(`https://viziq-production.up.railway.app/api/bubble-data?xColumn=${xColumn}&yColumn=${yColumn}&sizeColumn=${sizeColumn}`)
       .then((response) => setData(response.data));
   }, [xColumn, yColumn, sizeColumn]);
 

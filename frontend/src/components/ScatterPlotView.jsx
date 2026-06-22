@@ -9,7 +9,7 @@ function ScatterPlotView({ xColumn, yColumn, height = 380 }) {
   useEffect(() => {
     if (!xColumn || !yColumn) return;
     axios
-      .get(`http://localhost:8080/api/scatter-data?xColumn=${xColumn}&yColumn=${yColumn}`)
+      .get(`https://viziq-production.up.railway.app/api/scatter-data?xColumn=${xColumn}&yColumn=${yColumn}`)
       .then((response) => setData(response.data));
   }, [xColumn, yColumn]);
 

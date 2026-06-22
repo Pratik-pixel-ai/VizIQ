@@ -9,7 +9,7 @@ function HeatMapView({ xColumn, yColumn, height = 560 }) {
     if (!xColumn || !yColumn) return;
 
     axios
-      .get(`http://localhost:8080/api/heatmap-data?xColumn=${xColumn}&yColumn=${yColumn}`)
+      .get(`https://viziq-production.up.railway.app/api/heatmap-data?xColumn=${xColumn}&yColumn=${yColumn}`)
       .then((response) => {
         const data = response.data;
         const grouped = {};
