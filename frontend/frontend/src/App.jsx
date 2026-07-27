@@ -86,9 +86,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
 
-  const groupedOutliers = outliers.reduce((acc, outlier) => {
-    if (!acc[outlier.column]) acc[outlier.column] = [];
-    acc[outlier.column].push(outlier);
+  const groupedOutliers = (Array.isArray(outliers) ? outliers : []).reduce((acc, outlier) => {
+    if (outlier && outlier.column) {
+      if (!acc[outlier.column]) acc[outlier.column] = [];
+      acc[outlier.column].push(outlier);
+    }
     return acc;
   }, {});
 
@@ -105,16 +107,16 @@ function App() {
   };
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/api/columns`).then((r) => setColumns(r.data));
-    axios.get(`${API_BASE_URL}/api/preview`).then((r) => setRows(r.data));
-    axios.get(`${API_BASE_URL}/api/charts`).then((r) => setCharts(r.data));
-    axios.get(`${API_BASE_URL}/api/dataset-health`).then((r) => setDatasetHealth(r.data));
-    axios.get(`${API_BASE_URL}/api/insights`).then((r) => setInsights(r.data));
-    axios.get(`${API_BASE_URL}/api/summary`).then((r) => setSummary(r.data));
-    axios.get(`${API_BASE_URL}/api/outliers`).then((r) => setOutliers(r.data));
-    axios.get(`${API_BASE_URL}/api/correlations`).then((r) => setCorrelations(r.data));
-    axios.get(`${API_BASE_URL}/api/missing-values`).then((r) => setMissingValues(r.data));
-    axios.get(`${API_BASE_URL}/api/metadata`).then((r) => setMetadata(r.data)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/columns`).then((r) => setColumns(r.data || {})).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/preview`).then((r) => setRows(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/charts`).then((r) => setCharts(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/dataset-health`).then((r) => setDatasetHealth(r.data || null)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/insights`).then((r) => setInsights(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/summary`).then((r) => setSummary(r.data || null)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/outliers`).then((r) => setOutliers(Array.isArray(r.data) ? r.data : [])).catch(() => setOutliers([]));
+    axios.get(`${API_BASE_URL}/api/correlations`).then((r) => setCorrelations(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/missing-values`).then((r) => setMissingValues(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/metadata`).then((r) => setMetadata(r.data || null)).catch(() => {});
   }, []);
 
   const uploadFile = () => {

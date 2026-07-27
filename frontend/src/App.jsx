@@ -42,9 +42,11 @@ function App() {
   const [outliers, setOutliers] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const groupedOutliers = outliers.reduce((acc, outlier) => {
-    if (!acc[outlier.column]) acc[outlier.column] = [];
-    acc[outlier.column].push(outlier);
+  const groupedOutliers = (Array.isArray(outliers) ? outliers : []).reduce((acc, outlier) => {
+    if (outlier && outlier.column) {
+      if (!acc[outlier.column]) acc[outlier.column] = [];
+      acc[outlier.column].push(outlier);
+    }
     return acc;
   }, {});
 
@@ -62,16 +64,16 @@ function App() {
   };
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/api/columns`).then((response) => setColumns(response.data));
-    axios.get(`${API_BASE_URL}/api/preview`).then((response) => setRows(response.data));
-    axios.get(`${API_BASE_URL}/api/charts`).then((response) => setCharts(response.data));
-    axios.get(`${API_BASE_URL}/api/dataset-health`).then((response) => setDatasetHealth(response.data));
-    axios.get(`${API_BASE_URL}/api/insights`).then((response) => setInsights(response.data));
-    axios.get(`${API_BASE_URL}/api/summary`).then((response) => setSummary(response.data));
-    axios.get(`${API_BASE_URL}/api/outliers`).then((response) => setOutliers(response.data));
-    axios.get(`${API_BASE_URL}/api/correlations`).then((response) => setCorrelations(response.data));
-    axios.get(`${API_BASE_URL}/api/missing-values`).then((response) => setMissingValues(response.data));
-    axios.get(`${API_BASE_URL}/api/metadata`).then((response) => setMetadata(response.data)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/columns`).then((response) => setColumns(response.data || {})).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/preview`).then((response) => setRows(Array.isArray(response.data) ? response.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/charts`).then((response) => setCharts(Array.isArray(response.data) ? response.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/dataset-health`).then((response) => setDatasetHealth(response.data || null)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/insights`).then((response) => setInsights(Array.isArray(response.data) ? response.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/summary`).then((response) => setSummary(response.data || null)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/outliers`).then((response) => setOutliers(Array.isArray(response.data) ? response.data : [])).catch(() => setOutliers([]));
+    axios.get(`${API_BASE_URL}/api/correlations`).then((response) => setCorrelations(Array.isArray(response.data) ? response.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/missing-values`).then((response) => setMissingValues(Array.isArray(response.data) ? response.data : [])).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/metadata`).then((response) => setMetadata(response.data || null)).catch(() => {});
   }, []);
 
 const downloadReport = async () => {
