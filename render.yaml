@@ -2,7 +2,7 @@ services:
   # Backend Web Service (Spring Boot)
   - type: web
     name: viziq-backend
-    runtime: docker
+    env: docker
     rootDir: backend/backend
     dockerfilePath: Dockerfile
     plan: free
@@ -11,8 +11,9 @@ services:
         value: 8080
 
   # Frontend Static Site (Vite React)
-  - type: static
+  - type: web
     name: viziq-frontend
+    env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
