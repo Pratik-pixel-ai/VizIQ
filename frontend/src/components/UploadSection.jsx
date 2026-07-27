@@ -11,6 +11,7 @@ export default function UploadSection({ setFile, uploadFile, loading }) {
     if (!f) return;
     setFile(f);
     setFileName(f.name);
+    uploadFile(f);
   };
 
   return (

@@ -115,7 +115,11 @@ public class FileController {
         File destination =
                 new File(folder, file.getOriginalFilename());
 
-        file.transferTo(destination);
+        java.nio.file.Files.copy(
+                file.getInputStream(),
+                destination.toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+        );
 
         datasetService.setCurrentDatasetPath(
                 destination.getAbsolutePath()

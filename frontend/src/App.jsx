@@ -63,17 +63,38 @@ function App() {
       .catch((error) => console.error("Recommendation error:", error));
   };
 
+  const fetchDatasetData = async () => {
+    try {
+      const [colRes, prevRes, chartRes, healthRes, insightRes, sumRes, outRes, corrRes, missRes, metaRes] = await Promise.allSettled([
+        axios.get(`${API_BASE_URL}/api/columns`),
+        axios.get(`${API_BASE_URL}/api/preview`),
+        axios.get(`${API_BASE_URL}/api/charts`),
+        axios.get(`${API_BASE_URL}/api/dataset-health`),
+        axios.get(`${API_BASE_URL}/api/insights`),
+        axios.get(`${API_BASE_URL}/api/summary`),
+        axios.get(`${API_BASE_URL}/api/outliers`),
+        axios.get(`${API_BASE_URL}/api/correlations`),
+        axios.get(`${API_BASE_URL}/api/missing-values`),
+        axios.get(`${API_BASE_URL}/api/metadata`),
+      ]);
+
+      if (colRes.status === "fulfilled") setColumns(colRes.value.data || {});
+      if (prevRes.status === "fulfilled") setRows(Array.isArray(prevRes.value.data) ? prevRes.value.data : []);
+      if (chartRes.status === "fulfilled") setCharts(Array.isArray(chartRes.value.data) ? chartRes.value.data : []);
+      if (healthRes.status === "fulfilled") setDatasetHealth(healthRes.value.data || null);
+      if (insightRes.status === "fulfilled") setInsights(Array.isArray(insightRes.value.data) ? insightRes.value.data : []);
+      if (sumRes.status === "fulfilled") setSummary(sumRes.value.data || null);
+      if (outRes.status === "fulfilled") setOutliers(Array.isArray(outRes.value.data) ? outRes.value.data : []);
+      if (corrRes.status === "fulfilled") setCorrelations(Array.isArray(corrRes.value.data) ? corrRes.value.data : []);
+      if (missRes.status === "fulfilled") setMissingValues(Array.isArray(missRes.value.data) ? missRes.value.data : []);
+      if (metaRes.status === "fulfilled") setMetadata(metaRes.value.data || null);
+    } catch (e) {
+      console.error("Error fetching dataset data:", e);
+    }
+  };
+
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/api/columns`).then((response) => setColumns(response.data || {})).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/preview`).then((response) => setRows(Array.isArray(response.data) ? response.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/charts`).then((response) => setCharts(Array.isArray(response.data) ? response.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/dataset-health`).then((response) => setDatasetHealth(response.data || null)).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/insights`).then((response) => setInsights(Array.isArray(response.data) ? response.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/summary`).then((response) => setSummary(response.data || null)).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/outliers`).then((response) => setOutliers(Array.isArray(response.data) ? response.data : [])).catch(() => setOutliers([]));
-    axios.get(`${API_BASE_URL}/api/correlations`).then((response) => setCorrelations(Array.isArray(response.data) ? response.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/missing-values`).then((response) => setMissingValues(Array.isArray(response.data) ? response.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/metadata`).then((response) => setMetadata(response.data || null)).catch(() => {});
+    fetchDatasetData();
   }, []);
 
 const downloadReport = async () => {
@@ -126,20 +147,24 @@ const downloadReport = async () => {
   }
 };
 
-  const uploadFile = () => {
+  const uploadFile = (fileToUpload) => {
+    const targetFile = fileToUpload || file;
+    if (!targetFile) return;
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", targetFile);
     setLoading(true);
 
     axios
       .post(`${API_BASE_URL}/api/upload`, formData)
-      .then(() => {
-        window.location.reload();
+      .then(async () => {
+        await fetchDatasetData();
+        setLoading(false);
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Upload error:", error);
         setLoading(false);
-        alert("Upload Failed");
+        alert("Upload Failed. Please try uploading again.");
       });
   };
 

@@ -106,31 +106,58 @@ function App() {
       .catch((error) => console.error("Recommendation error:", error));
   };
 
+  const fetchDatasetData = async () => {
+    try {
+      const [colRes, prevRes, chartRes, healthRes, insightRes, sumRes, outRes, corrRes, missRes, metaRes] = await Promise.allSettled([
+        axios.get(`${API_BASE_URL}/api/columns`),
+        axios.get(`${API_BASE_URL}/api/preview`),
+        axios.get(`${API_BASE_URL}/api/charts`),
+        axios.get(`${API_BASE_URL}/api/dataset-health`),
+        axios.get(`${API_BASE_URL}/api/insights`),
+        axios.get(`${API_BASE_URL}/api/summary`),
+        axios.get(`${API_BASE_URL}/api/outliers`),
+        axios.get(`${API_BASE_URL}/api/correlations`),
+        axios.get(`${API_BASE_URL}/api/missing-values`),
+        axios.get(`${API_BASE_URL}/api/metadata`),
+      ]);
+
+      if (colRes.status === "fulfilled") setColumns(colRes.value.data || {});
+      if (prevRes.status === "fulfilled") setRows(Array.isArray(prevRes.value.data) ? prevRes.value.data : []);
+      if (chartRes.status === "fulfilled") setCharts(Array.isArray(chartRes.value.data) ? chartRes.value.data : []);
+      if (healthRes.status === "fulfilled") setDatasetHealth(healthRes.value.data || null);
+      if (insightRes.status === "fulfilled") setInsights(Array.isArray(insightRes.value.data) ? insightRes.value.data : []);
+      if (sumRes.status === "fulfilled") setSummary(sumRes.value.data || null);
+      if (outRes.status === "fulfilled") setOutliers(Array.isArray(outRes.value.data) ? outRes.value.data : []);
+      if (corrRes.status === "fulfilled") setCorrelations(Array.isArray(corrRes.value.data) ? corrRes.value.data : []);
+      if (missRes.status === "fulfilled") setMissingValues(Array.isArray(missRes.value.data) ? missRes.value.data : []);
+      if (metaRes.status === "fulfilled") setMetadata(metaRes.value.data || null);
+    } catch (e) {
+      console.error("Error fetching dataset data:", e);
+    }
+  };
+
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/api/columns`).then((r) => setColumns(r.data || {})).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/preview`).then((r) => setRows(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/charts`).then((r) => setCharts(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/dataset-health`).then((r) => setDatasetHealth(r.data || null)).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/insights`).then((r) => setInsights(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/summary`).then((r) => setSummary(r.data || null)).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/outliers`).then((r) => setOutliers(Array.isArray(r.data) ? r.data : [])).catch(() => setOutliers([]));
-    axios.get(`${API_BASE_URL}/api/correlations`).then((r) => setCorrelations(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/missing-values`).then((r) => setMissingValues(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-    axios.get(`${API_BASE_URL}/api/metadata`).then((r) => setMetadata(r.data || null)).catch(() => {});
+    fetchDatasetData();
   }, []);
 
-  const uploadFile = () => {
+  const uploadFile = (fileToUpload) => {
+    const targetFile = fileToUpload || file;
+    if (!targetFile) return;
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", targetFile);
     setLoading(true);
 
     axios
       .post(`${API_BASE_URL}/api/upload`, formData)
-      .then(() => window.location.reload())
-      .catch((error) => {
-        console.error(error);
+      .then(async () => {
+        await fetchDatasetData();
         setLoading(false);
-        alert("Upload Failed");
+      })
+      .catch((error) => {
+        console.error("Upload error:", error);
+        setLoading(false);
+        alert("Upload Failed. Please try uploading again.");
       });
   };
 
