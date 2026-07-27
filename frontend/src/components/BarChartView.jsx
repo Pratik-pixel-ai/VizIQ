@@ -9,13 +9,14 @@ import { PieChart, Pie, Cell, Legend, BarChart, Bar, XAxis, YAxis, Tooltip, Cart
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { tooltipStyle, axisProps, gridProps, palette } from "../chartTheme";
+import { API_BASE_URL } from "../api";
 
 function BarChartView({ selectedColumn, chartType, recommendedChart, xColumn, yColumn, sizeColumn, height = 380 }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     if (!selectedColumn) return;
-    axios.get(`https://viziq-production.up.railway.app/api/chart-data?column=${selectedColumn}`).then((response) => {
+    axios.get(`${API_BASE_URL}/api/chart-data?column=${selectedColumn}`).then((response) => {
       const chartData = Object.entries(response.data).map(([name, count]) => ({ name, count }));
       setData(chartData);
     });

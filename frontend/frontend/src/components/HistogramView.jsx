@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
+import { API_BASE_URL } from "../api";
 
 function HistogramView({ selectedColumn, height = 380 }) {
   const [data, setData] = useState([]);
@@ -9,7 +10,7 @@ function HistogramView({ selectedColumn, height = 380 }) {
   useEffect(() => {
     if (!selectedColumn) return;
     axios
-      .get(`https://viziq-production.up.railway.app/api/histogram-data?column=${selectedColumn}`)
+      .get(`${API_BASE_URL}/api/histogram-data?column=${selectedColumn}`)
       .then((response) => setData(response.data));
   }, [selectedColumn]);
 

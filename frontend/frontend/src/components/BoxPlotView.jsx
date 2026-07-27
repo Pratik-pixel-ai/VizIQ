@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 
 function BoxPlotView({ selectedColumn }) {
   const [stats, setStats] = useState(null);
@@ -7,7 +8,7 @@ function BoxPlotView({ selectedColumn }) {
   useEffect(() => {
     if (!selectedColumn) return;
     axios
-      .get(`https://viziq-production.up.railway.app/api/boxplot-data?column=${selectedColumn}`)
+      .get(`${API_BASE_URL}/api/boxplot-data?column=${selectedColumn}`)
       .then((response) => setStats(response.data));
   }, [selectedColumn]);
 

@@ -6,6 +6,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Charts from "./pages/Charts";
 import useTheme from "./hooks/useTheme";
+import { API_BASE_URL } from "./api";
 
 const formatChartName = (name) =>
   name
@@ -93,7 +94,7 @@ function App() {
 
   const getRecommendedChart = (column) => {
     axios
-      .get(`https://viziq-production.up.railway.app/api/recommend-chart?column=${column}`)
+      .get(`${API_BASE_URL}/api/recommend-chart?column=${column}`)
       .then((response) => {
         setRecommendedChart(response.data);
         if (response.data === "PIE_CHART") setChartType("PIE");
@@ -104,16 +105,16 @@ function App() {
   };
 
   useEffect(() => {
-    axios.get("https://viziq-production.up.railway.app/api/columns").then((r) => setColumns(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/preview").then((r) => setRows(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/charts").then((r) => setCharts(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/dataset-health").then((r) => setDatasetHealth(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/insights").then((r) => setInsights(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/summary").then((r) => setSummary(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/outliers").then((r) => setOutliers(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/correlations").then((r) => setCorrelations(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/missing-values").then((r) => setMissingValues(r.data));
-    axios.get("https://viziq-production.up.railway.app/api/metadata").then((r) => setMetadata(r.data)).catch(() => {});
+    axios.get(`${API_BASE_URL}/api/columns`).then((r) => setColumns(r.data));
+    axios.get(`${API_BASE_URL}/api/preview`).then((r) => setRows(r.data));
+    axios.get(`${API_BASE_URL}/api/charts`).then((r) => setCharts(r.data));
+    axios.get(`${API_BASE_URL}/api/dataset-health`).then((r) => setDatasetHealth(r.data));
+    axios.get(`${API_BASE_URL}/api/insights`).then((r) => setInsights(r.data));
+    axios.get(`${API_BASE_URL}/api/summary`).then((r) => setSummary(r.data));
+    axios.get(`${API_BASE_URL}/api/outliers`).then((r) => setOutliers(r.data));
+    axios.get(`${API_BASE_URL}/api/correlations`).then((r) => setCorrelations(r.data));
+    axios.get(`${API_BASE_URL}/api/missing-values`).then((r) => setMissingValues(r.data));
+    axios.get(`${API_BASE_URL}/api/metadata`).then((r) => setMetadata(r.data)).catch(() => {});
   }, []);
 
   const uploadFile = () => {
@@ -122,7 +123,7 @@ function App() {
     setLoading(true);
 
     axios
-      .post("https://viziq-production.up.railway.app/api/upload", formData)
+      .post(`${API_BASE_URL}/api/upload`, formData)
       .then(() => window.location.reload())
       .catch((error) => {
         console.error(error);
@@ -158,7 +159,7 @@ function App() {
       const formData = new FormData();
       if (chartBlob) formData.append("chartImage", chartBlob, "chart.jpg");
 
-      const response = await fetch("https://viziq-production.up.railway.app/api/report", {
+      const response = await fetch(`${API_BASE_URL}/api/report`, {
         method: "POST",
         body: formData,
       });

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
+import { API_BASE_URL } from "../api";
 
 function LineChartView({ xColumn, yColumn, height = 380 }) {
   const [data, setData] = useState([]);
@@ -9,7 +10,7 @@ function LineChartView({ xColumn, yColumn, height = 380 }) {
   useEffect(() => {
     if (!xColumn || !yColumn) return;
     axios
-      .get(`https://viziq-production.up.railway.app/api/line-data?xColumn=${xColumn}&yColumn=${yColumn}`)
+      .get(`${API_BASE_URL}/api/line-data?xColumn=${xColumn}&yColumn=${yColumn}`)
       .then((response) => setData(response.data));
   }, [xColumn, yColumn]);
 

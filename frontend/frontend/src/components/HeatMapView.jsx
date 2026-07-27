@@ -1,6 +1,7 @@
 import { ResponsiveHeatMap } from "@nivo/heatmap";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 
 function HeatMapView({ xColumn, yColumn, height = 560 }) {
   const [chartData, setChartData] = useState([]);
@@ -9,7 +10,7 @@ function HeatMapView({ xColumn, yColumn, height = 560 }) {
     if (!xColumn || !yColumn) return;
 
     axios
-      .get(`https://viziq-production.up.railway.app/api/heatmap-data?xColumn=${xColumn}&yColumn=${yColumn}`)
+      .get(`${API_BASE_URL}/api/heatmap-data?xColumn=${xColumn}&yColumn=${yColumn}`)
       .then((response) => {
         const data = response.data;
         const grouped = {};

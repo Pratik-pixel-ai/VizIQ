@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { tooltipStyle, axisProps, gridProps } from "../chartTheme";
+import { API_BASE_URL } from "../api";
 
 function BubbleChartView({ xColumn, yColumn, sizeColumn, height = 420 }) {
   const [data, setData] = useState([]);
@@ -9,7 +10,7 @@ function BubbleChartView({ xColumn, yColumn, sizeColumn, height = 420 }) {
   useEffect(() => {
     if (!xColumn || !yColumn || !sizeColumn) return;
     axios
-      .get(`https://viziq-production.up.railway.app/api/bubble-data?xColumn=${xColumn}&yColumn=${yColumn}&sizeColumn=${sizeColumn}`)
+      .get(`${API_BASE_URL}/api/bubble-data?xColumn=${xColumn}&yColumn=${yColumn}&sizeColumn=${sizeColumn}`)
       .then((response) => setData(response.data));
   }, [xColumn, yColumn, sizeColumn]);
 
